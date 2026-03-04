@@ -69,7 +69,7 @@
                             <div>
                                 <!-- Fancybox trigger attached to large image -->
                                 <a href="{{ slide.image.url }}" data-fancybox="gallery" data-caption="{{ slide.title }}">
-                                    <img src="{% thumbnail slide.image.file 'slide_large' %}" alt="{{ slide.title }}" class="img-fluid w-100" style="object-fit: cover; border-radius: 4px;">
+                                    <img src="{% thumbnail slide.image 'slide_large' %}" alt="{{ slide.title }}" class="img-fluid w-100" style="object-fit: cover; border-radius: 4px;">
                                 </a>
                             </div>
                         {% endif %}
@@ -81,7 +81,8 @@
                     {% for slide in slides %}
                         {% if slide.image %}
                             <div class="px-1">
-                                <img src="{% thumbnail slide.image.file 'slide_thumb' %}" alt="{{ slide.title }}" class="img-fluid rounded-1" style="object-fit: cover; height: 60px; width: 100%; opacity: 0.6; cursor: pointer; transition: opacity 0.3s ease;">
+                                <!-- Changed slide.image.file to slide.image to consistently render filer files -->
+                                <img src="{% thumbnail slide.image 'slide_thumb' %}" alt="{{ slide.title }}" class="img-fluid rounded-1" style="object-fit: cover; height: 60px; width: 100%; opacity: 0.6; cursor: pointer; transition: opacity 0.3s ease;">
                             </div>
                         {% endif %}
                     {% endfor %}
