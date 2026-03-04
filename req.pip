@@ -1,0 +1,9 @@
+Django~=5.2
+mysqlclient
+django-filer
+django-admin-sortable2
+easy_thumbnails
+Pillow
+django-polymorphic
+django-mptt
+django-appconf
