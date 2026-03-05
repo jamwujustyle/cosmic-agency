@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   db:
     image: mysql:8.0
@@ -7,10 +5,10 @@ services:
     environment:
       MYSQL_ROOT_PASSWORD: root
       MYSQL_DATABASE: slider_db
-    ports:
-      - "3306:3306"
     volumes:
       - mysql_data:/var/lib/mysql
+    networks:
+      - app_net
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
       interval: 10s
@@ -29,6 +27,8 @@ services:
       DB_USER: root
       DB_PASSWORD: root
       DB_NAME: slider_db
+    networks:
+      - app_net
     command: ["./migrator.sh"]
 
   web:
@@ -45,9 +45,15 @@ services:
       DB_USER: root
       DB_PASSWORD: root
       DB_NAME: slider_db
+    networks:
+      - app_net
     depends_on:
       migrator:
         condition: service_completed_successfully
 
 volumes:
   mysql_data:
+
+networks:
+  app_net:
+    driver: bridge

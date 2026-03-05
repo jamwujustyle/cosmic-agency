@@ -3,40 +3,33 @@ set -e
 
 echo "Waiting for MySQL database at $DB_HOST:$DB_PORT..."
 
-# Wait until nc can successfully connect to the DB port
-while ! nc -z $DB_HOST $DB_PORT; do
-  sleep 1
-done
+# Wait for MySQL and create the database using pymysql (handles DNS + connection retries)
+python -c "
+import os, sys, time, pymysql
 
-echo "MySQL database is up!"
+host = os.environ.get('DB_HOST', '127.0.0.1')
+port = int(os.environ.get('DB_PORT', 3306))
+user = os.environ.get('DB_USER', 'root')
+password = os.environ.get('DB_PASSWORD', '')
+db_name = os.environ.get('DB_NAME', 'slider_db')
 
-# Create database if it doesn't exist (using mysql client via python to avoid needing mysql-client pkg in image)
-cat << 'EOF' > create_db.py
-import os
-import pymysql
+for attempt in range(1, 31):
+    try:
+        conn = pymysql.connect(host=host, port=port, user=user, password=password, connect_timeout=3)
+        cursor = conn.cursor()
+        cursor.execute(f'CREATE DATABASE IF NOT EXISTS \`{db_name}\` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;')
+        conn.commit()
+        cursor.close()
+        conn.close()
+        print(f'MySQL is up! Database {db_name} ensured.')
+        sys.exit(0)
+    except Exception as e:
+        print(f'Attempt {attempt}/30: {e}')
+        time.sleep(2)
 
-host = os.environ.get("DB_HOST", "127.0.0.1")
-port = int(os.environ.get("DB_PORT", 3306))
-user = os.environ.get("DB_USER", "root")
-password = os.environ.get("DB_PASSWORD", "")
-db_name = os.environ.get("DB_NAME", "slider_db")
-
-try:
-    # Connect without specifying database to create it if it doesn't exist
-    conn = pymysql.connect(host=host, port=port, user=user, password=password)
-    cursor = conn.cursor()
-    cursor.execute(f"CREATE DATABASE IF NOT EXISTS `{db_name}` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;")
-    conn.commit()
-    cursor.close()
-    conn.close()
-    print(f"Database {db_name} ensured.")
-except Exception as e:
-    print(f"Error checking/creating database: {e}")
-    # Don't exit with code 1 here, let Django handle connection errors if any
-EOF
-
-python create_db.py
-rm create_db.py
+print('ERROR: Could not connect to MySQL after 30 attempts.')
+sys.exit(1)
+"
 
 echo "Generating missing migrations if any..."
 python manage.py makemigrations --noinput

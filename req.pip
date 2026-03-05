@@ -1,5 +1,6 @@
 Django~=5.2
 PyMySQL
+cryptography
 django-filer
 django-admin-sortable2
 easy_thumbnails
