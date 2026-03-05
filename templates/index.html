@@ -133,19 +133,14 @@
       <div class="slider slider-for mb-2 rounded-2 overflow-hidden shadow">
         {% for slide in slides %} {% if slide.image %}
         <div>
-          <!-- Fancybox trigger attached to large image -->
-          <a
-            href="{{ slide.image.url }}"
-            data-fancybox="gallery"
+          <img
+            src="{% thumbnail slide.image 'slide_large' %}"
+            data-full-src="{{ slide.image.url }}"
             data-caption="{{ slide.title }}"
-          >
-            <img
-              src="{% thumbnail slide.image 'slide_large' %}"
-              alt="{{ slide.title }}"
-              class="img-fluid w-100"
-              style="object-fit: cover; border-radius: 4px"
-            />
-          </a>
+            alt="{{ slide.title }}"
+            class="img-fluid w-100 gallery-image"
+            style="object-fit: cover; border-radius: 4px; cursor: pointer"
+          />
         </div>
         {% endif %} {% endfor %}
       </div>
