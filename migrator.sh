@@ -13,7 +13,7 @@ echo "MySQL database is up!"
 # Create database if it doesn't exist (using mysql client via python to avoid needing mysql-client pkg in image)
 cat << 'EOF' > create_db.py
 import os
-import MySQLdb
+import pymysql
 
 host = os.environ.get("DB_HOST", "127.0.0.1")
 port = int(os.environ.get("DB_PORT", 3306))
@@ -23,7 +23,7 @@ db_name = os.environ.get("DB_NAME", "slider_db")
 
 try:
     # Connect without specifying database to create it if it doesn't exist
-    conn = MySQLdb.connect(host=host, port=port, user=user, passwd=password)
+    conn = pymysql.connect(host=host, port=port, user=user, password=password)
     cursor = conn.cursor()
     cursor.execute(f"CREATE DATABASE IF NOT EXISTS `{db_name}` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;")
     conn.commit()
