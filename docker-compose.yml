@@ -21,6 +21,8 @@ services:
     depends_on:
       db:
         condition: service_healthy
+    volumes:
+      - media_data:/app/media
     environment:
       DB_HOST: db
       DB_PORT: 3306
@@ -37,6 +39,7 @@ services:
     command: python manage.py runserver 0.0.0.0:8000
     volumes:
       - .:/app
+      - media_data:/app/media
     ports:
       - "8000:8000"
     environment:
@@ -53,6 +56,7 @@ services:
 
 volumes:
   mysql_data:
+  media_data:
 
 networks:
   app_net:
